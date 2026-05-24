@@ -10,19 +10,19 @@
 #include <ArduinoJson.h>
 
 // ============================================================
-// KONFIGURASI — WAJIB DIISI SEBELUM UPLOAD
+// KONFIGURASI MQTT
 // ============================================================
 const char* WIFI_SSID   = "Arrasyadah";
 const char* WIFI_PASS   = "135641619";
-const char* MQTT_BROKER = "broker.emqx.io";       // dari Deployment Overview
+const char* MQTT_BROKER = "broker.emqx.io";
 const int   MQTT_PORT   = 1883;
-const char* MQTT_USER   = "";   // dari Authentication
-const char* MQTT_PASS  = "";   // dari Authentication
+const char* MQTT_USER   = "";
+const char* MQTT_PASS  = "";
 const char* MQTT_CLIENT = "inkubator_esp32_01";
 
 const char* TOPIC_STATUS = "Inkubator_Telur_ESP32_50";
 const char* TOPIC_CMD    = "Inkubator_Telur_ESP32_50/command";
-// ============================================================
+
 
 // ================= PIN =================
 #define DHTPIN        4
@@ -31,6 +31,7 @@ const char* TOPIC_CMD    = "Inkubator_Telur_ESP32_50/command";
 #define RELAY_KIPAS   27
 #define BUTTON_RESET  13
 #define SERVO_PIN     14
+#define BUZZER        25
 
 // ================= OBJECT =================
 DHT dht(DHTPIN, DHTTYPE);
@@ -62,7 +63,7 @@ unsigned long lastReconnect = 0;
 const unsigned long intervalSensor    = 2000;
 const unsigned long intervalMQTT      = 5000;
 const unsigned long intervalReconnect = 5000;
-const unsigned long intervalServo     = 28800000UL; // fallback millis (8 jam)
+const unsigned long intervalServo     = 30000UL;      // Testing 30 detik | Untuk 8 jam ganti ke: 28800000UL
 
 int posisiServo       = 0;
 int jamRotasiTerakhir = -1;
@@ -218,8 +219,8 @@ void updateOLED(int hari) {
 
   display.setCursor(0, 52);
   bool wifiOk = WiFi.status() == WL_CONNECTED;
-  display.print(wifiOk ? "WiFi:OK " : "WiFi:-- ");
-  display.print(mqtt.connected() ? "MQTT:OK" : "MQTT:--");
+  display.print(wifiOk ? "WiFi: OK " : "WiFi:-- ");
+  display.print(mqtt.connected() ? "" : "MQTT:--");
 
   display.display();
 }
@@ -242,6 +243,9 @@ void setup() {
 
   digitalWrite(RELAY_LAMPU, LOW);
   digitalWrite(RELAY_KIPAS, LOW);
+
+  pinMode(BUZZER, OUTPUT);
+  digitalWrite(BUZZER, LOW);
 
   // RTC
   Serial.print("Init RTC...");
@@ -336,6 +340,12 @@ void loop() {
       lastServo = millis();
       jamRotasiTerakhir = -1;
       Serial.println("[RESET] Hari direset ke 1");
+
+      // Buzzer bip sekali tanda reset
+      digitalWrite(BUZZER, HIGH);
+      delay(300);
+      digitalWrite(BUZZER, LOW);
+
       while (digitalRead(BUTTON_RESET) == LOW);
     }
   }
@@ -351,11 +361,11 @@ void loop() {
       suhu = t;
       hum  = h;
 
-      if (suhu < 36.5)      lampu = true;
-      else if (suhu > 37.5) lampu = false;
+      if (suhu < 37.5)      lampu = true;
+      else if (suhu > 38.0) lampu = false;
 
-      if (suhu > 37.5)      kipas = true;
-      else if (suhu < 36.5) kipas = false;
+      if (suhu > 38.0)      kipas = true;
+      else if (suhu < 37.6) kipas = false;
 
       digitalWrite(RELAY_LAMPU, lampu ? HIGH : LOW);
       digitalWrite(RELAY_KIPAS, kipas ? HIGH : LOW);
