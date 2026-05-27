@@ -52,9 +52,9 @@ class MqttService extends ChangeNotifier {
   static const broker = 'broker.emqx.io';
   static const port = 1883;
 
-  static const topicSub = 'Inkubator_Telur_ESP32_50';
+  static const topicSub = '';
 
-  static const topicPub = 'Inkubator_Telur_ESP32_50/command';
+  static const topicPub = '';
 
   // ==========================================================
   late MqttServerClient _client;
