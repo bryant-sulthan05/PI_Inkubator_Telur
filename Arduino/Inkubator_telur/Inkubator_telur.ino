@@ -12,16 +12,16 @@
 // ============================================================
 // KONFIGURASI MQTT
 // ============================================================
-const char* WIFI_SSID   = "Arrasyadah";
-const char* WIFI_PASS   = "135641619";
-const char* MQTT_BROKER = "broker.emqx.io";
-const int   MQTT_PORT   = 1883;
+const char* WIFI_SSID   = ""; // Wifi ssid
+const char* WIFI_PASS   = ""; // Password wifi
+const char* MQTT_BROKER = "";
+const int   MQTT_PORT   = ;
 const char* MQTT_USER   = "";
 const char* MQTT_PASS  = "";
-const char* MQTT_CLIENT = "inkubator_esp32_01";
+const char* MQTT_CLIENT = "";
 
-const char* TOPIC_STATUS = "Inkubator_Telur_ESP32_50";
-const char* TOPIC_CMD    = "Inkubator_Telur_ESP32_50/command";
+const char* TOPIC = "";
+const char* TOPIC_CMD    = "";
 
 
 // ================= PIN =================
